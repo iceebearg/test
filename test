@@ -1,0 +1,1141 @@
+--// =========================================================================
+--//    COBALT UI LIBRARY (v1.0)
+--//    Modern Desktop-Grade Game Script Interface inspired by Cobalt
+--// =========================================================================
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local CobaltUI = {
+    Version = "1.0.0",
+    Windows = {},
+    ActivePopups = {}
+}
+
+--// Lucide Icons Registry
+local Icons = {
+    Registry = {
+        ["eye"]          = { Id = 16898613353, Size = Vector2.new(48, 48), Offset = Vector2.new(771, 563) },
+        ["crosshair"]    = { Id = 16898613044, Size = Vector2.new(48, 48), Offset = Vector2.new(967, 820) },
+        ["zap"]          = { Id = 16898613869, Size = Vector2.new(48, 48), Offset = Vector2.new(967, 955) },
+        ["shield"]       = { Id = 16898613777, Size = Vector2.new(48, 48), Offset = Vector2.new(869, 0) },
+        ["sliders"]      = { Id = 16898613869, Size = Vector2.new(48, 48), Offset = Vector2.new(579, 955) },
+        ["palette"]      = { Id = 16898613613, Size = Vector2.new(48, 48), Offset = Vector2.new(482, 906) },
+        ["settings"]     = { Id = 16898613777, Size = Vector2.new(48, 48), Offset = Vector2.new(771, 0) },
+        ["user"]         = { Id = 16898613869, Size = Vector2.new(48, 48), Offset = Vector2.new(385, 955) },
+        ["code"]         = { Id = 16898613044, Size = Vector2.new(48, 48), Offset = Vector2.new(661, 820) },
+        ["chevron-down"] = { Id = 16898612819, Size = Vector2.new(48, 48), Offset = Vector2.new(482, 906) },
+        ["check"]        = { Id = 16898612819, Size = Vector2.new(48, 48), Offset = Vector2.new(869, 955) },
+        ["search"]       = { Id = 16898613699, Size = Vector2.new(48, 48), Offset = Vector2.new(918, 857) },
+        ["minus"]        = { Id = 16898613613, Size = Vector2.new(48, 48), Offset = Vector2.new(771, 196) },
+        ["x"]            = { Id = 16898613869, Size = Vector2.new(48, 48), Offset = Vector2.new(869, 906) },
+        ["info"]         = { Id = 16898613509, Size = Vector2.new(48, 48), Offset = Vector2.new(482, 0) },
+        ["sparkles"]     = { Id = 16898613869, Size = Vector2.new(48, 48), Offset = Vector2.new(676, 955) }
+    }
+}
+
+function Icons.Apply(imgLabel, iconName)
+    local data = Icons.Registry[iconName] or Icons.Registry["sparkles"]
+    imgLabel.Image = "rbxassetid://" .. data.Id
+    imgLabel.ImageRectSize = data.Size
+    imgLabel.ImageRectOffset = data.Offset
+    imgLabel.ScaleType = Enum.ScaleType.Fit
+end
+
+--// Declarative UI Builder (Inspired by Cobalt's Interface.New)
+local UI = {}
+
+function UI.New(className, props)
+    local obj = Instance.new(className)
+    for k, v in pairs(props or {}) do
+        if typeof(k) == "number" and typeof(v) == "Instance" then
+            v:Clone().Parent = obj
+        elseif typeof(v) == "table" and not (k == "Color" or k == "Transparency" or k == "Keypoints") then
+            local child = UI.New(k, v)
+            child.Parent = obj
+        else
+            pcall(function() obj[k] = v end)
+        end
+    end
+    return obj
+end
+
+local function addMetallicGradient(parent, rot, c1, c2, c3)
+    local grad = Instance.new("UIGradient")
+    grad.Rotation = rot or 45
+    grad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, c1 or Color3.fromRGB(36, 38, 46)),
+        ColorSequenceKeypoint.new(0.5, c2 or Color3.fromRGB(24, 25, 30)),
+        ColorSequenceKeypoint.new(1, c3 or c1 or Color3.fromRGB(18, 19, 23))
+    })
+    grad.Parent = parent
+    return grad
+end
+
+local function applyBounce(btn, baseW, baseH)
+    btn.AnchorPoint = Vector2.new(0.5, 0.5)
+    btn.MouseButton1Down:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, baseW - 3, 0, baseH - 3)
+        }):Play()
+    end)
+    btn.MouseButton1Up:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, baseW, 0, baseH)
+        }):Play()
+    end)
+end
+
+--// Notification System (Cobalt Sonner style)
+local NotificationContainer
+local function getNotificationContainer(screenGui)
+    if not NotificationContainer or not NotificationContainer.Parent then
+        NotificationContainer = UI.New("Frame", {
+            Name = "CobaltNotifications",
+            Size = UDim2.new(0, 290, 1, -20),
+            Position = UDim2.new(1, -300, 0, 10),
+            BackgroundTransparency = 1,
+            ZIndex = 9999,
+            Parent = screenGui
+        })
+        local layout = UI.New("UIListLayout", {
+            VerticalAlignment = Enum.VerticalAlignment.Bottom,
+            HorizontalAlignment = Enum.HorizontalAlignment.Right,
+            Padding = UDim.new(0, 8),
+            Parent = NotificationContainer
+        })
+    end
+    return NotificationContainer
+end
+
+function CobaltUI:Notify(config)
+    local title = config.Title or "Notification"
+    local desc = config.Content or config.Desc or ""
+    local duration = config.Duration or 3.5
+    local icon = config.Icon or "info"
+    
+    local container = getNotificationContainer(CobaltUI.ScreenGui)
+    
+    local toast = UI.New("Frame", {
+        Size = UDim2.new(1, 0, 0, 56),
+        Position = UDim2.new(1, 100, 0, 0),
+        BackgroundColor3 = Color3.fromRGB(18, 19, 24),
+        BorderSizePixel = 0,
+        ZIndex = 10000,
+        Parent = container
+    })
+    
+    local corner = UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = toast })
+    local stroke = UI.New("UIStroke", { Color = Color3.fromRGB(60, 64, 78), Thickness = 1, Parent = toast })
+    addMetallicGradient(toast, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(18, 19, 24))
+    
+    local ico = UI.New("ImageLabel", {
+        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(0, 12, 0, 10),
+        BackgroundTransparency = 1,
+        ImageColor3 = Color3.fromRGB(255, 255, 255),
+        ZIndex = 10001,
+        Parent = toast
+    })
+    Icons.Apply(ico, icon)
+    
+    local tLbl = UI.New("TextLabel", {
+        Size = UDim2.new(1, -40, 0, 16),
+        Position = UDim2.new(0, 36, 0, 10),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = title,
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 10001,
+        Parent = toast
+    })
+    
+    local dLbl = UI.New("TextLabel", {
+        Size = UDim2.new(1, -40, 0, 20),
+        Position = UDim2.new(0, 36, 0, 26),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Gotham,
+        Text = desc,
+        TextColor3 = Color3.fromRGB(160, 165, 180),
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        ZIndex = 10001,
+        Parent = toast
+    })
+    
+    toast.Position = UDim2.new(1, 200, 0, 0)
+    TweenService:Create(toast, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0, 0, 0, 0)
+    }):Play()
+    
+    task.delay(duration, function()
+        local outTween = TweenService:Create(toast, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+            Position = UDim2.new(1, 200, 0, 0),
+            BackgroundTransparency = 1
+        })
+        outTween:Play()
+        outTween.Completed:Connect(function()
+            toast:Destroy()
+        end)
+    end)
+end
+
+--// Window Factory
+function CobaltUI:CreateWindow(opt)
+    local WindowName = opt.Title or "Cobalt UI"
+    local SubTitle = opt.SubTitle or "Game Script Suite"
+    local WindowSize = opt.Size or UDim2.fromOffset(680, 440)
+    local ToggleKey = opt.ToggleKey or Enum.KeyCode.RightControl
+    
+    local ScreenGui = UI.New("ScreenGui", {
+        Name = "CobaltUI_" .. math.random(1000, 9999),
+        ResetOnSpawn = false,
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    })
+    
+    pcall(function()
+        if gethui then ScreenGui.Parent = gethui()
+        elseif syn and syn.protect_gui then syn.protect_gui(ScreenGui); ScreenGui.Parent = CoreGui
+        else
+            ScreenGui.Parent = CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+        end
+    end)
+    CobaltUI.ScreenGui = ScreenGui
+    
+    -- Main Window Container
+    local Main = UI.New("Frame", {
+        Name = "Main",
+        Size = WindowSize,
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = Color3.fromRGB(15, 16, 20),
+        BorderSizePixel = 0,
+        Parent = ScreenGui
+    })
+    
+    local MainCorner = UI.New("UICorner", { CornerRadius = UDim.new(0, 10), Parent = Main })
+    local MainStroke = UI.New("UIStroke", { Color = Color3.fromRGB(48, 52, 64), Thickness = 1.2, Parent = Main })
+    addMetallicGradient(Main, 65, Color3.fromRGB(24, 25, 32), Color3.fromRGB(15, 16, 20))
+    
+    -- Header Bar
+    local Header = UI.New("Frame", {
+        Name = "Header",
+        Size = UDim2.new(1, 0, 0, 44),
+        BackgroundColor3 = Color3.fromRGB(22, 23, 29),
+        BorderSizePixel = 0,
+        Parent = Main
+    })
+    local HeaderCorner = UI.New("UICorner", { CornerRadius = UDim.new(0, 10), Parent = Header })
+    
+    -- Corner Hider (Cobalt technique to keep top rounded and bottom straight)
+    local HeaderHider = UI.New("Frame", {
+        Size = UDim2.new(1, 0, 0, 12),
+        Position = UDim2.new(0, 0, 1, -12),
+        BackgroundColor3 = Color3.fromRGB(22, 23, 29),
+        BorderSizePixel = 0,
+        Parent = Header
+    })
+    
+    local HeaderLine = UI.New("Frame", {
+        Size = UDim2.new(1, 0, 0, 1),
+        Position = UDim2.new(0, 0, 1, -1),
+        BackgroundColor3 = Color3.fromRGB(42, 45, 56),
+        BorderSizePixel = 0,
+        Parent = Header
+    })
+    
+    local Logo = UI.New("ImageLabel", {
+        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(0, 14, 0.5, -9),
+        BackgroundTransparency = 1,
+        ImageColor3 = Color3.fromRGB(255, 255, 255),
+        Parent = Header
+    })
+    Icons.Apply(Logo, opt.Icon or "sparkles")
+    
+    local TitleLabel = UI.New("TextLabel", {
+        Size = UDim2.new(0, 300, 1, 0),
+        Position = UDim2.new(0, 40, 0, 0),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = WindowName .. ' <font color="#9AA0B4"><font size="11">| ' .. SubTitle .. '</font></font>',
+        RichText = true,
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = Header
+    })
+    
+    -- Window Controls
+    local Controls = UI.New("Frame", {
+        Size = UDim2.new(0, 68, 1, 0),
+        Position = UDim2.new(1, -74, 0, 0),
+        BackgroundTransparency = 1,
+        Parent = Header
+    })
+    
+    local function createCtrlBtn(iconName, xOffset, col)
+        local btn = UI.New("TextButton", {
+            Size = UDim2.new(0, 26, 0, 26),
+            Position = UDim2.new(0, xOffset, 0.5, 0),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            BackgroundColor3 = Color3.fromRGB(30, 32, 40),
+            BorderSizePixel = 0,
+            Text = "",
+            AutoButtonColor = false,
+            Parent = Controls
+        })
+        UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = btn })
+        UI.New("UIStroke", { Color = Color3.fromRGB(48, 52, 64), Thickness = 1, Parent = btn })
+        local img = UI.New("ImageLabel", {
+            Size = UDim2.new(0, 12, 0, 12),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            BackgroundTransparency = 1,
+            ImageColor3 = col or Color3.fromRGB(240, 240, 250),
+            Parent = btn
+        })
+        Icons.Apply(img, iconName)
+        applyBounce(btn, 26, 26)
+        return btn
+    end
+    
+    local MinBtn = createCtrlBtn("minus", 14, Color3.fromRGB(220, 225, 235))
+    local CloseBtn = createCtrlBtn("x", 48, Color3.fromRGB(255, 110, 120))
+    
+    -- Body
+    local Body = UI.New("Frame", {
+        Name = "Body",
+        Size = UDim2.new(1, 0, 1, -44),
+        Position = UDim2.new(0, 0, 0, 44),
+        BackgroundTransparency = 1,
+        Parent = Main
+    })
+    
+    -- Sidebar (Tabs)
+    local Sidebar = UI.New("Frame", {
+        Name = "Sidebar",
+        Size = UDim2.new(0, 175, 1, 0),
+        BackgroundColor3 = Color3.fromRGB(18, 19, 24),
+        BorderSizePixel = 0,
+        Parent = Body
+    })
+    local SideDivider = UI.New("Frame", {
+        Size = UDim2.new(0, 1, 1, 0),
+        Position = UDim2.new(1, -1, 0, 0),
+        BackgroundColor3 = Color3.fromRGB(36, 38, 48),
+        BorderSizePixel = 0,
+        Parent = Sidebar
+    })
+    
+    local TabScroll = UI.New("ScrollingFrame", {
+        Size = UDim2.new(1, -12, 1, -16),
+        Position = UDim2.new(0, 6, 0, 8),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        ScrollBarThickness = 2,
+        ScrollBarImageColor3 = Color3.fromRGB(48, 52, 64),
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        Parent = Sidebar
+    })
+    UI.New("UIListLayout", {
+        Padding = UDim.new(0, 5),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = TabScroll
+    })
+    
+    -- Content Container (Right Pane)
+    local ContentContainer = UI.New("Frame", {
+        Name = "Content",
+        Size = UDim2.new(1, -175, 1, 0),
+        Position = UDim2.new(0, 175, 0, 0),
+        BackgroundTransparency = 1,
+        Parent = Body
+    })
+    
+    -- Drag & Minimize Logic
+    local dragging, dragStart, startPos
+    Header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            TweenService:Create(Main, TweenInfo.new(0.04, Enum.EasingStyle.Linear), {
+                Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            }):Play()
+        end
+    end)
+    
+    local isMin = false
+    MinBtn.MouseButton1Click:Connect(function()
+        isMin = not isMin
+        Body.Visible = not isMin
+        TweenService:Create(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {
+            Size = isMin and UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset, 0, 44) or WindowSize
+        }):Play()
+    end)
+    
+    CloseBtn.MouseButton1Click:Connect(function()
+        Main.Visible = false
+    end)
+    
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if not gpe and input.KeyCode == ToggleKey then
+            Main.Visible = not Main.Visible
+        end
+    end)
+    
+    local WindowAPI = {
+        Tabs = {},
+        ActiveTab = nil,
+        Main = Main
+    }
+    
+    --// Tab Creator
+    function WindowAPI:CreateTab(tabName, tabIcon)
+        local TabBtn = UI.New("TextButton", {
+            Name = tabName .. "_Tab",
+            Size = UDim2.new(1, 0, 0, 34),
+            BackgroundColor3 = Color3.fromRGB(26, 28, 36),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Text = "",
+            AutoButtonColor = false,
+            Parent = TabScroll
+        })
+        local TabCorner = UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = TabBtn })
+        local TabStroke = UI.New("UIStroke", { Color = Color3.fromRGB(48, 52, 64), Thickness = 1, Transparency = 1, Parent = TabBtn })
+        
+        local TabIco = UI.New("ImageLabel", {
+            Size = UDim2.new(0, 16, 0, 16),
+            Position = UDim2.new(0, 10, 0.5, -8),
+            BackgroundTransparency = 1,
+            ImageColor3 = Color3.fromRGB(150, 155, 170),
+            Parent = TabBtn
+        })
+        Icons.Apply(TabIco, tabIcon or "sparkles")
+        
+        local TabLbl = UI.New("TextLabel", {
+            Size = UDim2.new(1, -38, 1, 0),
+            Position = UDim2.new(0, 34, 0, 0),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.GothamSemibold,
+            Text = tabName,
+            TextColor3 = Color3.fromRGB(160, 165, 180),
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = TabBtn
+        })
+        
+        -- Tab Page Content
+        local TabPage = UI.New("ScrollingFrame", {
+            Name = tabName .. "_Page",
+            Size = UDim2.new(1, -20, 1, -20),
+            Position = UDim2.new(0, 10, 0, 10),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = Color3.fromRGB(48, 52, 64),
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            Visible = false,
+            Parent = ContentContainer
+        })
+        UI.New("UIListLayout", {
+            Padding = UDim.new(0, 8),
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Parent = TabPage
+        })
+        
+        local TabAPI = {
+            Page = TabPage
+        }
+        
+        local function activateTab()
+            for _, t in pairs(WindowAPI.Tabs) do
+                t.Page.Visible = false
+                TweenService:Create(t.Btn, TweenInfo.new(0.18), { BackgroundTransparency = 1 }):Play()
+                TweenService:Create(t.Stroke, TweenInfo.new(0.18), { Transparency = 1 }):Play()
+                TweenService:Create(t.Lbl, TweenInfo.new(0.18), { TextColor3 = Color3.fromRGB(160, 165, 180) }):Play()
+                TweenService:Create(t.Ico, TweenInfo.new(0.18), { ImageColor3 = Color3.fromRGB(150, 155, 170) }):Play()
+            end
+            TabPage.Visible = true
+            TweenService:Create(TabBtn, TweenInfo.new(0.18), { BackgroundTransparency = 0 }):Play()
+            TweenService:Create(TabStroke, TweenInfo.new(0.18), { Transparency = 0 }):Play()
+            TweenService:Create(TabLbl, TweenInfo.new(0.18), { TextColor3 = Color3.fromRGB(255, 255, 255) }):Play()
+            TweenService:Create(TabIco, TweenInfo.new(0.18), { ImageColor3 = Color3.fromRGB(255, 255, 255) }):Play()
+            WindowAPI.ActiveTab = TabAPI
+        end
+        
+        TabBtn.MouseButton1Click:Connect(activateTab)
+        
+        TabAPI.Btn = TabBtn
+        TabAPI.Stroke = TabStroke
+        TabAPI.Lbl = TabLbl
+        TabAPI.Ico = TabIco
+        
+        table.insert(WindowAPI.Tabs, TabAPI)
+        if #WindowAPI.Tabs == 1 then
+            activateTab()
+        end
+        
+        --// Section Component
+        function TabAPI:AddSection(secTitle)
+            local SecFrame = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 24),
+                BackgroundTransparency = 1,
+                Parent = TabPage
+            })
+            local SecLbl = UI.New("TextLabel", {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamBold,
+                Text = string.upper(secTitle),
+                TextColor3 = Color3.fromRGB(100, 105, 125),
+                TextSize = 10,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = SecFrame
+            })
+        end
+        
+        --// 1. Button Component
+        function TabAPI:AddButton(cfg)
+            local bTitle = cfg.Title or "Button"
+            local bDesc = cfg.Desc or ""
+            local callback = cfg.Callback or function() end
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, bDesc ~= "" and 48 or 38),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            local CardStroke = UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            local TextHolder = UI.New("Frame", {
+                Size = UDim2.new(1, -80, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Parent = Card
+            })
+            UI.New("TextLabel", {
+                Size = UDim2.new(1, 0, 0, 18),
+                Position = UDim2.new(0, 0, 0, bDesc ~= "" and 7 or 10),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = bTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = TextHolder
+            })
+            if bDesc ~= "" then
+                UI.New("TextLabel", {
+                    Size = UDim2.new(1, 0, 0, 16),
+                    Position = UDim2.new(0, 0, 0, 24),
+                    BackgroundTransparency = 1,
+                    Font = Enum.Font.Gotham,
+                    Text = bDesc,
+                    TextColor3 = Color3.fromRGB(130, 135, 150),
+                    TextSize = 10,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Parent = TextHolder
+                })
+            end
+            
+            local ActBtn = UI.New("TextButton", {
+                Size = UDim2.new(0, 54, 0, 24),
+                Position = UDim2.new(1, -66, 0.5, 0),
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = Color3.fromRGB(36, 39, 50),
+                BorderSizePixel = 0,
+                Font = Enum.Font.GothamBold,
+                Text = "Click",
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 11,
+                AutoButtonColor = false,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = ActBtn })
+            UI.New("UIStroke", { Color = Color3.fromRGB(56, 60, 76), Thickness = 1, Parent = ActBtn })
+            
+            applyBounce(ActBtn, 54, 24)
+            ActBtn.MouseButton1Click:Connect(function()
+                pcall(callback)
+            end)
+        end
+        
+        --// 2. Toggle Component
+        function TabAPI:AddToggle(cfg)
+            local tTitle = cfg.Title or "Toggle"
+            local tDesc = cfg.Desc or ""
+            local state = cfg.Default or false
+            local callback = cfg.Callback or function() end
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, tDesc ~= "" and 48 or 38),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            local CardStroke = UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            local TextHolder = UI.New("Frame", {
+                Size = UDim2.new(1, -70, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Parent = Card
+            })
+            UI.New("TextLabel", {
+                Size = UDim2.new(1, 0, 0, 18),
+                Position = UDim2.new(0, 0, 0, tDesc ~= "" and 7 or 10),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = tTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = TextHolder
+            })
+            if tDesc ~= "" then
+                UI.New("TextLabel", {
+                    Size = UDim2.new(1, 0, 0, 16),
+                    Position = UDim2.new(0, 0, 0, 24),
+                    BackgroundTransparency = 1,
+                    Font = Enum.Font.Gotham,
+                    Text = tDesc,
+                    TextColor3 = Color3.fromRGB(130, 135, 150),
+                    TextSize = 10,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Parent = TextHolder
+                })
+            end
+            
+            local Switch = UI.New("TextButton", {
+                Size = UDim2.new(0, 42, 0, 22),
+                Position = UDim2.new(1, -54, 0.5, 0),
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = state and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(36, 39, 50),
+                BorderSizePixel = 0,
+                Text = "",
+                AutoButtonColor = false,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = Switch })
+            local SwStroke = UI.New("UIStroke", { Color = state and Color3.fromRGB(56, 224, 128) or Color3.fromRGB(56, 60, 76), Thickness = 1, Parent = Switch })
+            
+            local Dot = UI.New("Frame", {
+                Size = UDim2.new(0, 16, 0, 16),
+                Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                BorderSizePixel = 0,
+                Parent = Switch
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = Dot })
+            
+            local function updateToggle(val)
+                state = val
+                TweenService:Create(Switch, TweenInfo.new(0.18), {
+                    BackgroundColor3 = state and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(36, 39, 50)
+                }):Play()
+                TweenService:Create(SwStroke, TweenInfo.new(0.18), {
+                    Color = state and Color3.fromRGB(56, 224, 128) or Color3.fromRGB(56, 60, 76)
+                }):Play()
+                TweenService:Create(Dot, TweenInfo.new(0.18, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
+                }):Play()
+                pcall(callback, state)
+            end
+            
+            Switch.MouseButton1Click:Connect(function()
+                updateToggle(not state)
+            end)
+            
+            return {
+                Set = updateToggle,
+                Get = function() return state end
+            }
+        end
+        
+        --// 3. Slider Component
+        function TabAPI:AddSlider(cfg)
+            local sTitle = cfg.Title or "Slider"
+            local sDesc = cfg.Desc or ""
+            local min = cfg.Min or 0
+            local max = cfg.Max or 100
+            local def = math.clamp(cfg.Default or min, min, max)
+            local suffix = cfg.Suffix or ""
+            local precision = cfg.Precision or 0
+            local callback = cfg.Callback or function() end
+            
+            local val = def
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 54),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            local TopRow = UI.New("Frame", {
+                Size = UDim2.new(1, -24, 0, 20),
+                Position = UDim2.new(0, 12, 0, 6),
+                BackgroundTransparency = 1,
+                Parent = Card
+            })
+            UI.New("TextLabel", {
+                Size = UDim2.new(1, -60, 1, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = sTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = TopRow
+            })
+            local ValLbl = UI.New("TextLabel", {
+                Size = UDim2.new(0, 60, 1, 0),
+                Position = UDim2.new(1, -60, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamBold,
+                Text = tostring(val) .. suffix,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 11,
+                TextXAlignment = Enum.TextXAlignment.Right,
+                Parent = TopRow
+            })
+            
+            local SliderTrack = UI.New("Frame", {
+                Size = UDim2.new(1, -24, 0, 8),
+                Position = UDim2.new(0, 12, 0, 34),
+                BackgroundColor3 = Color3.fromRGB(36, 39, 50),
+                BorderSizePixel = 0,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderTrack })
+            
+            local FillPct = (val - min) / (max - min)
+            local SliderFill = UI.New("Frame", {
+                Size = UDim2.new(FillPct, 0, 1, 0),
+                BackgroundColor3 = Color3.fromRGB(245, 245, 250),
+                BorderSizePixel = 0,
+                Parent = SliderTrack
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderFill })
+            addMetallicGradient(SliderFill, 90, Color3.fromRGB(255, 255, 255), Color3.fromRGB(180, 185, 200))
+            
+            local SliderBtn = UI.New("TextButton", {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                Text = "",
+                Parent = SliderTrack
+            })
+            
+            local sliding = false
+            local function updateSlider(input)
+                local trackAbs = SliderTrack.AbsolutePosition.X
+                local trackSize = SliderTrack.AbsoluteSize.X
+                local mouseX = input.Position.X
+                local pct = math.clamp((mouseX - trackAbs) / trackSize, 0, 1)
+                
+                local rawVal = min + (max - min) * pct
+                if precision == 0 then
+                    val = math.floor(rawVal + 0.5)
+                else
+                    val = math.floor(rawVal * (10 ^ precision) + 0.5) / (10 ^ precision)
+                end
+                
+                SliderFill.Size = UDim2.new(pct, 0, 1, 0)
+                ValLbl.Text = tostring(val) .. suffix
+                pcall(callback, val)
+            end
+            
+            SliderBtn.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sliding = true
+                    updateSlider(input)
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sliding = false
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    updateSlider(input)
+                end
+            end)
+            
+            return {
+                Set = function(newVal)
+                    val = math.clamp(newVal, min, max)
+                    local pct = (val - min) / (max - min)
+                    SliderFill.Size = UDim2.new(pct, 0, 1, 0)
+                    ValLbl.Text = tostring(val) .. suffix
+                    pcall(callback, val)
+                end,
+                Get = function() return val end
+            }
+        end
+        
+        --// 4. Dropdown / Combo Component
+        function TabAPI:AddDropdown(cfg)
+            local dTitle = cfg.Title or "Dropdown"
+            local options = cfg.Options or {}
+            local default = cfg.Default or (options[1] or "None")
+            local callback = cfg.Callback or function() end
+            local selected = default
+            
+            local isOpen = false
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 42),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                ClipsDescendants = true,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            local CardStroke = UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            local HeaderBtn = UI.New("TextButton", {
+                Size = UDim2.new(1, 0, 0, 42),
+                BackgroundTransparency = 1,
+                Text = "",
+                AutoButtonColor = false,
+                Parent = Card
+            })
+            UI.New("TextLabel", {
+                Size = UDim2.new(0.5, 0, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = dTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = HeaderBtn
+            })
+            local SelectedLbl = UI.New("TextLabel", {
+                Size = UDim2.new(0.5, -46, 1, 0),
+                Position = UDim2.new(0.5, 0, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.Gotham,
+                Text = tostring(selected),
+                TextColor3 = Color3.fromRGB(150, 155, 170),
+                TextSize = 11,
+                TextXAlignment = Enum.TextXAlignment.Right,
+                TextTruncate = Enum.TextTruncate.AtEnd,
+                Parent = HeaderBtn
+            })
+            local Arrow = UI.New("ImageLabel", {
+                Size = UDim2.new(0, 14, 0, 14),
+                Position = UDim2.new(1, -26, 0.5, -7),
+                BackgroundTransparency = 1,
+                ImageColor3 = Color3.fromRGB(180, 185, 200),
+                Parent = HeaderBtn
+            })
+            Icons.Apply(Arrow, "chevron-down")
+            
+            local OptContainer = UI.New("Frame", {
+                Size = UDim2.new(1, -24, 0, #options * 28),
+                Position = UDim2.new(0, 12, 0, 44),
+                BackgroundTransparency = 1,
+                Parent = Card
+            })
+            local OptLayout = UI.New("UIListLayout", {
+                Padding = UDim.new(0, 2),
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Parent = OptContainer
+            })
+            
+            local function refreshOptions()
+                for _, child in pairs(OptContainer:GetChildren()) do
+                    if child:IsA("TextButton") then child:Destroy() end
+                end
+                for _, optName in ipairs(options) do
+                    local isSel = (optName == selected)
+                    local oBtn = UI.New("TextButton", {
+                        Size = UDim2.new(1, 0, 0, 26),
+                        BackgroundColor3 = isSel and Color3.fromRGB(36, 39, 50) or Color3.fromRGB(24, 26, 34),
+                        BackgroundTransparency = isSel and 0 or 1,
+                        BorderSizePixel = 0,
+                        Text = "",
+                        AutoButtonColor = false,
+                        Parent = OptContainer
+                    })
+                    UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = oBtn })
+                    UI.New("TextLabel", {
+                        Size = UDim2.new(1, -20, 1, 0),
+                        Position = UDim2.new(0, 10, 0, 0),
+                        BackgroundTransparency = 1,
+                        Font = isSel and Enum.Font.GothamBold or Enum.Font.Gotham,
+                        Text = optName,
+                        TextColor3 = isSel and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 165, 180),
+                        TextSize = 11,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        Parent = oBtn
+                    })
+                    oBtn.MouseButton1Click:Connect(function()
+                        selected = optName
+                        SelectedLbl.Text = tostring(selected)
+                        isOpen = false
+                        TweenService:Create(Arrow, TweenInfo.new(0.2), { Rotation = 0 }):Play()
+                        TweenService:Create(Card, TweenInfo.new(0.2, Enum.EasingStyle.Quart), {
+                            Size = UDim2.new(1, 0, 0, 42)
+                        }):Play()
+                        refreshOptions()
+                        pcall(callback, selected)
+                    end)
+                end
+            end
+            refreshOptions()
+            
+            HeaderBtn.MouseButton1Click:Connect(function()
+                isOpen = not isOpen
+                local targetH = isOpen and (48 + #options * 28) or 42
+                TweenService:Create(Arrow, TweenInfo.new(0.2), { Rotation = isOpen and 180 or 0 }):Play()
+                TweenService:Create(Card, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {
+                    Size = UDim2.new(1, 0, 0, targetH)
+                }):Play()
+            end)
+            
+            return {
+                Set = function(val)
+                    selected = val
+                    SelectedLbl.Text = tostring(selected)
+                    refreshOptions()
+                    pcall(callback, selected)
+                end,
+                SetOptions = function(newOpts)
+                    options = newOpts
+                    refreshOptions()
+                end,
+                Get = function() return selected end
+            }
+        end
+        
+        --// 5. ColorPicker Component
+        function TabAPI:AddColorPicker(cfg)
+            local cTitle = cfg.Title or "Color Picker"
+            local color = cfg.Default or Color3.fromRGB(255, 255, 255)
+            local callback = cfg.Callback or function() end
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 38),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            UI.New("TextLabel", {
+                Size = UDim2.new(1, -60, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = cTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = Card
+            })
+            
+            local Preview = UI.New("TextButton", {
+                Size = UDim2.new(0, 32, 0, 20),
+                Position = UDim2.new(1, -44, 0.5, -10),
+                BackgroundColor3 = color,
+                BorderSizePixel = 0,
+                Text = "",
+                AutoButtonColor = false,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = Preview })
+            UI.New("UIStroke", { Color = Color3.fromRGB(60, 64, 78), Thickness = 1, Parent = Preview })
+            
+            -- Cycle Colors for simple interactive demo
+            local presetColors = {
+                Color3.fromRGB(255, 75, 75),
+                Color3.fromRGB(46, 204, 113),
+                Color3.fromRGB(52, 152, 219),
+                Color3.fromRGB(241, 196, 15),
+                Color3.fromRGB(155, 89, 182),
+                Color3.fromRGB(255, 255, 255)
+            }
+            local colorIdx = 1
+            Preview.MouseButton1Click:Connect(function()
+                colorIdx = (colorIdx % #presetColors) + 1
+                color = presetColors[colorIdx]
+                Preview.BackgroundColor3 = color
+                pcall(callback, color)
+            end)
+            
+            return {
+                Set = function(c) color = c; Preview.BackgroundColor3 = color; pcall(callback, color) end,
+                Get = function() return color end
+            }
+        end
+        
+        --// 6. Keybind Component
+        function TabAPI:AddKeybind(cfg)
+            local kTitle = cfg.Title or "Keybind"
+            local boundKey = cfg.Default or Enum.KeyCode.E
+            local callback = cfg.Callback or function() end
+            local isBinding = false
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 38),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            UI.New("TextLabel", {
+                Size = UDim2.new(1, -80, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = kTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = Card
+            })
+            
+            local BindBtn = UI.New("TextButton", {
+                Size = UDim2.new(0, 60, 0, 22),
+                Position = UDim2.new(1, -72, 0.5, -11),
+                BackgroundColor3 = Color3.fromRGB(36, 39, 50),
+                BorderSizePixel = 0,
+                Font = Enum.Font.GothamBold,
+                Text = boundKey.Name,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 11,
+                AutoButtonColor = false,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = BindBtn })
+            UI.New("UIStroke", { Color = Color3.fromRGB(56, 60, 76), Thickness = 1, Parent = BindBtn })
+            
+            BindBtn.MouseButton1Click:Connect(function()
+                isBinding = true
+                BindBtn.Text = "..."
+            end)
+            
+            UserInputService.InputBegan:Connect(function(input, gpe)
+                if isBinding and input.UserInputType == Enum.UserInputType.Keyboard then
+                    boundKey = input.KeyCode
+                    BindBtn.Text = boundKey.Name
+                    isBinding = false
+                    pcall(callback, boundKey)
+                elseif not gpe and input.KeyCode == boundKey and not isBinding then
+                    pcall(callback, boundKey)
+                end
+            end)
+            
+            return {
+                Set = function(k) boundKey = k; BindBtn.Text = boundKey.Name end,
+                Get = function() return boundKey end
+            }
+        end
+        
+        --// 7. TextBox / Input Component
+        function TabAPI:AddInput(cfg)
+            local iTitle = cfg.Title or "Input"
+            local placeholder = cfg.Placeholder or "Type here..."
+            local default = cfg.Default or ""
+            local callback = cfg.Callback or function() end
+            
+            local Card = UI.New("Frame", {
+                Size = UDim2.new(1, 0, 0, 38),
+                BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+                BorderSizePixel = 0,
+                Parent = TabPage
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 8), Parent = Card })
+            UI.New("UIStroke", { Color = Color3.fromRGB(38, 42, 52), Thickness = 1, Parent = Card })
+            addMetallicGradient(Card, 90, Color3.fromRGB(28, 30, 38), Color3.fromRGB(20, 21, 27))
+            
+            UI.New("TextLabel", {
+                Size = UDim2.new(0.5, 0, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.GothamSemibold,
+                Text = iTitle,
+                TextColor3 = Color3.fromRGB(245, 245, 255),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = Card
+            })
+            
+            local BoxHolder = UI.New("Frame", {
+                Size = UDim2.new(0.5, -24, 0, 24),
+                Position = UDim2.new(0.5, 12, 0.5, -12),
+                BackgroundColor3 = Color3.fromRGB(16, 17, 22),
+                BorderSizePixel = 0,
+                Parent = Card
+            })
+            UI.New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = BoxHolder })
+            local BoxStroke = UI.New("UIStroke", { Color = Color3.fromRGB(48, 52, 64), Thickness = 1, Parent = BoxHolder })
+            
+            local Box = UI.New("TextBox", {
+                Size = UDim2.new(1, -12, 1, 0),
+                Position = UDim2.new(0, 6, 0, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.Gotham,
+                Text = default,
+                PlaceholderText = placeholder,
+                PlaceholderColor3 = Color3.fromRGB(90, 95, 110),
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 11,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ClearTextOnFocus = false,
+                Parent = BoxHolder
+            })
+            
+            Box.FocusLost:Connect(function(enterPressed)
+                pcall(callback, Box.Text, enterPressed)
+            end)
+            
+            return {
+                Set = function(t) Box.Text = t; pcall(callback, t, true) end,
+                Get = function() return Box.Text end
+            }
+        end
+        
+        return TabAPI
+    end
+    
+    return WindowAPI
+end
+
+return CobaltUI
