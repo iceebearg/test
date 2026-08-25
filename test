@@ -2289,4 +2289,4 @@ then O=o(O,3)end local T for U in q(O,'([^/]*)/?')do local V=U if U=='..'then V=
 FindFirstChild(V)if not W then local X=S.Parent if X then W=X:FindFirstChild(V)end end if W then S=W elseif U~=T and U~=
 'init'and U~='init.server'and U~='init.client'then ah('Virtual script path "'..O..'" not found',2)end end T=U end if S.
 ClassName~='ModuleScript'then ah(Q,2)elseif S==I then ah(R,2)end return G(S)end return J(e,O,...)end return L,M,N end
-for H,I in ai,y do s(G,I)end return G(F:GetChildren()[1])
+for H,I in ai,y do s(G,I)end local _rf = G(F:GetChildren()[1]) pcall(function() if getgenv then getgenv().Rayfield = _rf end end) return _rf
