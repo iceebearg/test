@@ -1,4 +1,4 @@
--- Rayfield Gen2 v1.1.9
+-- Rayfield Gen2 v1.1.0
 -- loadstring(game:HttpGet("https://sirius.menu/gen2"))()
 local a local aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,b,c,d,e,f,g,h,i,j={function()local b,c,d=a(1)local e return(function(...)
 local f,g,h,i,j=d(c.utility.variables),d(c.utility.image),d(c.utility.locale),d(c.utility.constants),d(c.types)export
@@ -385,16 +385,12 @@ Parent=E.top},{ImageColor3='ContentColor'})E.interact=E.window:Create('TextButto
 new(1,0,0,41),Position=UDim2.fromScale(0,0),BorderSizePixel=0,Text='',TextTransparency=1,ZIndex=10,AutoButtonColor=false
 ,Parent=E.main})E.panel=E.window:Create('Frame',{AnchorPoint=Vector2.new(1,1),Position=UDim2.new(1,0,1,0),Size=UDim2.
 new(1,0,1,-47),BorderSizePixel=0,BackgroundColor3=Color3.fromRGB(255,255,255),ZIndex=1,BackgroundTransparency=1,Parent=E
-.main})E.panelStroke=E.window:StyleElementPanel(E.panel)E.window:Create('UIListLayout',{Padding=UDim.new(0,5),
-FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.
-HorizontalAlignment.Center,SortOrder=Enum.SortOrder.LayoutOrder,Parent=E.panel})E.window:Create('UIPadding',{PaddingTop=
+.main})E.panelStroke=E.window:StyleElementPanel(E.panel)E.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.HorizontalAlignment.Center,SortOrder=Enum.SortOrder.LayoutOrder,Parent=E.panel})E.window:Create('UIPadding',{PaddingTop=
 UDim.new(0,7),PaddingBottom=UDim.new(0,6),Parent=E.panel})E:_buildSearch()E.list=E.window:Create('ScrollingFrame',{
 Active=true,Size=UDim2.new(1,0,0,0),BorderSizePixel=0,BackgroundTransparency=1,ClipsDescendants=true,AutomaticCanvasSize
 =Enum.AutomaticSize.Y,CanvasSize=UDim2.new(),ScrollBarImageColor3=Color3.fromRGB(240,240,240),ScrollBarThickness=3,
 ScrollBarImageTransparency=1,ScrollingDirection=Enum.ScrollingDirection.Y,LayoutOrder=2,ZIndex=1,Parent=E.panel})E.
-window:Create('UIFlexItem',{FlexMode=Enum.UIFlexMode.Fill,Parent=E.list})E.listLayout=E.window:Create('UIListLayout',{
-Padding=UDim.new(0,5),SortOrder=Enum.SortOrder.LayoutOrder,HorizontalAlignment=Enum.HorizontalAlignment.Center,Parent=E.
-list})E.window:Create('UIPadding',{PaddingBottom=UDim.new(0,2),Parent=E.list})local function F(G)return table.find(E.
+window:Create('UIFlexItem',{FlexMode=Enum.UIFlexMode.Fill,Parent=E.list})E.listLayout=E.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Vertical,SortOrder=Enum.SortOrder.LayoutOrder,HorizontalAlignment=Enum.HorizontalAlignment.Center,Parent=E.list})E.window:Create('UIPadding',{PaddingBottom=UDim.new(0,2),Parent=E.list})local function F(G)return table.find(E.
 value,G)~=nil end local function G(H,I)local J=F(H.name)local K,L,M,N=if E._isOpen then(J and 0.9 or 0.95)else 1,if E.
 _isOpen then(J and 0 or 0.3)else 1,if E._isOpen then(J and 0 or 0.7)else 1,if E._isOpen then(J and 0.85 or 0.93)else 1 j
 .assign(H.checkIcon,'Image',if J then o else p)if I then local O=TweenInfo.new(0.3,Enum.EasingStyle.Exponential,Enum.
@@ -2060,7 +2056,7 @@ X)f[h]=i if i>g then g=i end end e={advance=f,maxWidth=g}aj[d]=e return e end fu
 setmetatable({window=b,container=c,textSize=d.textSize or 16,transparency=d.transparency or 1,duration=d.duration or
 0.55,slots={},length=0},ag)e.roll=TweenInfo.new(e.duration,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)e.zIndex=math
 .max(c.ZIndex+1,6)e.height=math.ceil(e.textSize)local f=ak(b.theme.Font,e.textSize)e.advance=f.advance e.maxWidth=f.
-maxWidth b:Create('UIListLayout',{FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=d.alignment,SortOrder=Enum.SortOrder.LayoutOrder,Parent=e.displayHost})return e end function ag._reel(b,c)local d=b.slots[c]if d.reel then return d.reel end local e=b.
+maxWidth b:Create('UIListLayout',{FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=d.alignment,SortOrder=Enum.SortOrder.LayoutOrder,Parent=c})return e end function ag._reel(b,c)local d=b.slots[c]if d.reel then return d.reel end local e=b.
 window:Create('Frame',{Name='Reel',Size=UDim2.fromOffset(b.maxWidth,b.height),BackgroundTransparency=1,BorderSizePixel=0
 ,ClipsDescendants=true,ZIndex=b.zIndex,Parent=b.container})local f=b.window:Create('Frame',{Size=UDim2.fromOffset(b.
 maxWidth,b.height),AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0,0,0),BackgroundTransparency=1,BorderSizePixel
