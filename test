@@ -1,4 +1,4 @@
--- Rayfield Gen2 v1.1.3
+-- Rayfield Gen2 v1.1.0
 -- loadstring(game:HttpGet("https://sirius.menu/gen2"))()
 local a local aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,b,c,d,e,f,g,h,i,j={function()local b,c,d=a(1)local e return(function(...)
 local f,g,h,i,j=d(c.utility.variables),d(c.utility.image),d(c.utility.locale),d(c.utility.constants),d(c.types)export
@@ -57,7 +57,7 @@ main=m.window:Create('Frame',{Size=UDim2.new(1,-20,0,43),BorderSizePixel=0,Name=
 255,255,255),BackgroundTransparency=1,Parent=m.tab.tabPage},{BackgroundTransparency='ElementTransparency'})m.stroke=m.
 window:StyleElementBody(m.main)m.hoverOverlay=m.window:CreateHoverOverlay(m.main)m.container=m.window:Create('Frame',{
 BorderSizePixel=0,Parent=m.main,Size=UDim2.new(0,170,0,16),Position=UDim2.new(0,20,0.5,0),AnchorPoint=Vector2.new(0,0.5)
-,BackgroundTransparency=1})m.containerLayout=m.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,Parent=m.container}))if m.icon then m.iconLabel=m.window:Create('ImageLabel',{Image=m.icon,Size=UDim2.fromOffset(16,
+,BackgroundTransparency=1})m.containerLayout=m.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,Parent=m.container})if m.icon then m.iconLabel=m.window:Create('ImageLabel',{Image=m.icon,Size=UDim2.fromOffset(16,
 16),BorderSizePixel=0,BackgroundTransparency=1,ImageTransparency=1,Parent=m.container},{ImageColor3='ContentColor'})end
 m.title=m.window:Create('TextLabel',{Text=k.t(m.name),Size=UDim2.fromOffset(250,16),BorderSizePixel=0,
 BackgroundTransparency=1,TextSize=16,AutomaticSize=Enum.AutomaticSize.X,TextXAlignment=Enum.TextXAlignment.Left,
@@ -370,7 +370,7 @@ BackgroundTransparency=1,Parent=E.tab.tabPage})E.top=E.window:Create('Frame',{Si
 fromScale(0,0),BorderSizePixel=0,BackgroundColor3=Color3.fromRGB(255,255,255),BackgroundTransparency=1,ZIndex=1,Parent=E
 .main},{BackgroundTransparency='ElementTransparency'})E.stroke=E.window:StyleElementPanel(E.top)E.hoverOverlay=E.window:
 CreateHoverOverlay(E.top)E.flashTarget=E.top E.container=E.window:Create('Frame',{BorderSizePixel=0,Parent=E.top,Size=
-UDim2.new(0,170,0,16),Position=UDim2.new(0,20,0.5,0),AnchorPoint=Vector2.new(0,0.5),BackgroundTransparency=1,ZIndex=5})E.containerLayout=E.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,Parent=E.container}))if
+UDim2.new(0,170,0,16),Position=UDim2.new(0,20,0.5,0),AnchorPoint=Vector2.new(0,0.5),BackgroundTransparency=1,ZIndex=5})E.containerLayout=E.window:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,Parent=E.container})if
 E.icon then E.iconLabel=E.window:Create('ImageLabel',{Image=E.icon,Size=UDim2.fromOffset(16,16),BorderSizePixel=0,
 BackgroundTransparency=1,ImageTransparency=1,ZIndex=5,Parent=E.container},{ImageColor3='ContentColor'})end E.title=E.
 window:Create('TextLabel',{Text=l.t(E.name),Size=UDim2.fromOffset(150,16),BorderSizePixel=0,BackgroundTransparency=1,
@@ -1024,7 +1024,7 @@ titleContainer},{TextColor3='ContentColor',FontFace='TitleFont'})l.mainGradient=
 =Vector2.new(0,0.5),Color=d.neutral.fill,Transparency=e,Parent=l.gradientContainer})m:Create('UICorner',{Parent=l.
 gradientContainer},{CornerRadius='ElementCornerRadius'})if l.icon then l.iconLabel=m:Create('ImageLabel',{Image=l.icon,
 Size=UDim2.fromOffset(32,32),BorderSizePixel=0,BackgroundTransparency=1,ZIndex=10,ImageTransparency=1,Parent=l.
-titleContainer},{ImageColor3='ContentColor'})end l.containerLayout=m:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=l.titleContainer}))l.valueHost=m:Create('Frame',{
+titleContainer},{ImageColor3='ContentColor'})end l.containerLayout=m:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=l.titleContainer})l.valueHost=m:Create('Frame',{
 AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,20,1,-15),Size=UDim2.fromOffset(200,20),BackgroundTransparency=1,
 BorderSizePixel=0,ZIndex=10,Parent=l.main})l.changeHost=m:Create('Frame',{AnchorPoint=Vector2.new(1,1),Position=UDim2.
 new(1,-20,1,-15),Size=UDim2.fromOffset(200,15),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=10,Parent=l.main})l.
@@ -1111,7 +1111,7 @@ window:Create('UICorner',{Parent=i.topbarItem},{CornerRadius='PillCornerRadius'}
 Create('UIStroke',{ApplyStrokeMode=Enum.ApplyStrokeMode.Border,Color=Color3.fromRGB(255,255,255),Transparency=1,Parent=i
 .topbarItem})i.topbarItemStrokeGradient=i.window:Create('UIGradient',{Rotation=90,Parent=i.topbarItemStroke},{Color={
 'TabStroke',ah.toColorSequence}})i.topbarItemContainer=i.window:Create('Frame',{Size=UDim2.new(1,0,1,0),AutomaticSize=Enum.AutomaticSize.None,BackgroundTransparency=1,BorderSizePixel=0,Parent=i.topbarItem})i.window:Create(
-'UIPadding',{PaddingLeft=UDim.new(0,13),PaddingRight=UDim.new(0,14),Parent=i.topbarItemContainer})i.topbarItemLayout=i.window:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=i.topbarItemContainer}))if i.icon then i.topbarItemIcon=i.window:Create('ImageLabel',{Image=i.icon,Size=UDim2.
+'UIPadding',{PaddingLeft=UDim.new(0,13),PaddingRight=UDim.new(0,14),Parent=i.topbarItemContainer})i.topbarItemLayout=i.window:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=i.topbarItemContainer})if i.icon then i.topbarItemIcon=i.window:Create('ImageLabel',{Image=i.icon,Size=UDim2.
 fromOffset(16,16),BorderSizePixel=0,BackgroundTransparency=1,ImageTransparency=1,Parent=i.topbarItemContainer},{
 ImageColor3='TabColor'})end if i.name then i.topbarItemTitle=i.window:Create('TextLabel',{Text=ai.t(i.name),Size=UDim2.
 fromOffset(0,16),BorderSizePixel=0,BackgroundTransparency=1,TextSize=16,AutomaticSize=Enum.AutomaticSize.XY,
@@ -1378,7 +1378,7 @@ NumberSequenceKeypoint.new(0.7007,0.631),NumberSequenceKeypoint.new(1,1)},Parent
 function(z)return ColorSequence.new(ag.toColorSequence(z).Keypoints[1].Value)end}})y.topbar=y:Create('Frame',{
 BackgroundTransparency=1,Size=UDim2.new(1,0,0,66),Active=true,Parent=y.main})y.topContainer=y:Create('Frame',{Size=UDim2
 .new(0,300,0,24),Position=UDim2.new(0,25,0.5,0),AutomaticSize=Enum.AutomaticSize.Y,AnchorPoint=Vector2.new(0,0.5),
-BackgroundTransparency=1,Parent=y.topbar})y.topContainerLayout=y:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.topContainer}))y.titleContainer=y:Create('Frame',{
+BackgroundTransparency=1,Parent=y.topbar})y.topContainerLayout=y:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.topContainer})y.titleContainer=y:Create('Frame',{
 Size=UDim2.fromOffset(50,24),Position=UDim2.new(0,25,0.5,0),AutomaticSize=Enum.AutomaticSize.XY,AnchorPoint=Vector2.new(
 0,0.5),BackgroundTransparency=1,LayoutOrder=1,Parent=y.topContainer})y.titleContainerLayout=y:Create('UIListLayout',{
 Padding=UDim.new(0,3),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Center,
@@ -1400,7 +1400,7 @@ VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.Horizon
 SortOrder.LayoutOrder,ScrollWheelInputEnabled=false,GamepadInputEnabled=false,TouchInputEnabled=false,EasingStyle=Enum.
 EasingStyle.Exponential,TweenTime=0.4,Parent=y.elements})y.tabList=y:Create('ScrollingFrame',{Name='Tabs',Active=true,Size=UDim2.new(0,160,1,-84),Position=UDim2.new(0,14,0,72),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollBarImageTransparency=1,ScrollingDirection=Enum.ScrollingDirection.Y,Parent=y.main})y.tabListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tabList})y:Create('UIPadding',{PaddingLeft=UDim.new(0,2),PaddingRight=UDim.new(0,6),PaddingTop=UDim.new(0,4),Parent=y.tabList})y.actionContainer=y:Create('Frame',{AnchorPoint=Vector2.new(1,
 0.5),AutomaticSize=Enum.AutomaticSize.X,Size=UDim2.fromOffset(0,24),Position=UDim2.new(1,-20,0.5,0),
-BackgroundTransparency=1,Parent=y.topbar})y.actionsListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Right,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.actionContainer}))y.rfSettings=y:CreateTab{name=
+BackgroundTransparency=1,Parent=y.topbar})y.actionsListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Right,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.actionContainer})y.rfSettings=y:CreateTab{name=
 'Rayfield Settings',customOrder=1000,neglectSelector=true,forgetState=true}ac(ab.Parent.action).new(y,{name='Close',icon
 =ai.icons.close,order=1,callback=function()y:ToggleHide()end})y.minimiseAction=ac(ab.Parent.action).new(y,{name=
 'Minimise',icon=ai.icons.minimise,order=2,callback=function()y:ToggleMinimise()end})y.settingsAction=ac(ab.Parent.action
@@ -2062,7 +2062,7 @@ X)f[h]=i if i>g then g=i end end e={advance=f,maxWidth=g}aj[d]=e return e end fu
 setmetatable({window=b,container=c,textSize=d.textSize or 16,transparency=d.transparency or 1,duration=d.duration or
 0.55,slots={},length=0},ag)e.roll=TweenInfo.new(e.duration,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)e.zIndex=math
 .max(c.ZIndex+1,6)e.height=math.ceil(e.textSize)local f=ak(b.theme.Font,e.textSize)e.advance=f.advance e.maxWidth=f.
-maxWidth b:Create('UIListLayout',{FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=d.alignment,SortOrder=Enum.SortOrder.LayoutOrder,Parent=e.displayHost}))return e end function ag._reel(b,c)local d=b.slots[c]if d.reel then return d.reel end local e=b.
+maxWidth b:Create('UIListLayout',{FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=d.alignment,SortOrder=Enum.SortOrder.LayoutOrder,Parent=e.displayHost})return e end function ag._reel(b,c)local d=b.slots[c]if d.reel then return d.reel end local e=b.
 window:Create('Frame',{Name='Reel',Size=UDim2.fromOffset(b.maxWidth,b.height),BackgroundTransparency=1,BorderSizePixel=0
 ,ClipsDescendants=true,ZIndex=b.zIndex,Parent=b.container})local f=b.window:Create('Frame',{Size=UDim2.fromOffset(b.
 maxWidth,b.height),AnchorPoint=Vector2.new(0.5,0),Position=UDim2.new(0.5,0,0,0),BackgroundTransparency=1,BorderSizePixel
