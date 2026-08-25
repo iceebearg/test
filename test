@@ -1105,8 +1105,8 @@ g._dragConnection:Disconnect()g._dragConnection=nil end if g._outsideClickConn t
 _outsideClickConn=nil end end end local d,e,f={selected={background=0,stroke=0,content=0},hover={background=0.4,stroke=
 0.3,content=0.3},unselected={background=0.8,stroke=0.65,content=0.5},hidden={background=1,stroke=1,content=1}},TweenInfo
 .new(0.4,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection
-.Out)function ae.new(g,h)h=if typeof(h)=='table'then h else{}local i=setmetatable({window=assert(g,
-'Missing argument #1 (Window expected)'),name=h.name or h.Name,icon=h.icon or h.Icon,neglectSelector=h.neglectSelector
+.Out)function ae.new(g,h,extraIcon)if typeof(h)=='string'then h={Name=h,Icon=extraIcon}elseif typeof(h)~='table'then h={}end local i=setmetatable({window=assert(g,
+'Missing argument #1 (Window expected)'),name=h.name or h.Name or'Tab',icon=h.icon or h.Icon,neglectSelector=h.neglectSelector
 or h.NeglectSelector or false,customOrder=h.customOrder or h.CustomOrder or 0,forgetState=h.forgetState or h.ForgetState
 or false,elements={},connections={}},ae)assert(i.name or i.icon,'A tab needs a name or an icon.')if not i.
 neglectSelector then i.topbarItem=i.window:Create('Frame',{Name=i.name,Size=UDim2.fromOffset(0,34),AutomaticSize=Enum.
@@ -1445,8 +1445,8 @@ in w.themeProperties do for B,C in A do local D=if typeof(C)=='table'then C[2](w
 )=='Color3'or typeof(D)=='number'then f.tweenService:Create(z,TweenInfo.new(0.5,Enum.EasingStyle.Quint,Enum.
 EasingDirection.Out),{[B]=D}):Play()else z[B]=D end end end if w.hidden then w._themeRefreshPending=true else w:
 _refreshElementThemes()end w:_syncLiveAnimation()end function h._refreshElementThemes(w)for x,y in w.tabs do for z,A in
-y.elements do if A._refreshTheme then A:_refreshTheme()end end end end function h.CreateTab(w,x)local y=ac(ab.Parent.tab
-).new(w,x)table.insert(w.tabs,y)if not y.neglectSelector then local z=true for A,B in w.tabs do if B~=y and not B.
+y.elements do if A._refreshTheme then A:_refreshTheme()end end end end function h.CreateTab(w,x,extraIcon)if typeof(x)=='string'then x={Name=x,Icon=extraIcon}end local y=ac(ab.Parent.tab
+).new(w,x,extraIcon)table.insert(w.tabs,y)if not y.neglectSelector then local z=true for A,B in w.tabs do if B~=y and not B.
 neglectSelector then z=false break end end if z then y:Select(true)end if not w.hidden and not w.minimised then y.
 topbarItem.Visible=true y:_applyVisual(if w.selectedTab==y then'selected'else'unselected',TweenInfo.new(0.4,Enum.
 EasingStyle.Quint,Enum.EasingDirection.Out))end end return y end function h.CreateTag(w,x)local y=ac(ab.Parent.tag).new(
