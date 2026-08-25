@@ -1109,16 +1109,14 @@ _outsideClickConn=nil end end end local d,e,f={selected={background=0,stroke=0,c
 'Missing argument #1 (Window expected)'),name=h.name or h.Name or'Tab',icon=h.icon or h.Icon,neglectSelector=h.neglectSelector
 or h.NeglectSelector or false,customOrder=h.customOrder or h.CustomOrder or 0,forgetState=h.forgetState or h.ForgetState
 or false,elements={},connections={}},ae)assert(i.name or i.icon,'A tab needs a name or an icon.')if not i.
-neglectSelector then i.topbarItem=i.window:Create('Frame',{Name=i.name,Size=UDim2.fromOffset(0,34),AutomaticSize=Enum.
-AutomaticSize.X,BackgroundColor3=Color3.fromRGB(255,255,255),BorderSizePixel=0,BackgroundTransparency=1,Visible=false,
+neglectSelector then i.topbarItem=i.window:Create('Frame',{Name=i.name,Size=UDim2.new(1,0,0,34),AutomaticSize=Enum.AutomaticSize.None,BackgroundColor3=Color3.fromRGB(255,255,255),BorderSizePixel=0,BackgroundTransparency=1,Visible=false,
 LayoutOrder=i.customOrder or 0,Parent=i.window.tabList})i.topbarItemInteract=i.window:Create('TextButton',{Active=false,
 BackgroundTransparency=1,Size=UDim2.fromScale(1,1),BorderSizePixel=0,Text='',TextTransparency=1,Parent=i.topbarItem})i.
 window:Create('UICorner',{Parent=i.topbarItem},{CornerRadius='PillCornerRadius'})i.topbarItemGradient=i.window:Create(
 'UIGradient',{Rotation=90,Parent=i.topbarItem},{Color={'TabBackground',ah.toColorSequence}})i.topbarItemStroke=i.window:
 Create('UIStroke',{ApplyStrokeMode=Enum.ApplyStrokeMode.Border,Color=Color3.fromRGB(255,255,255),Transparency=1,Parent=i
 .topbarItem})i.topbarItemStrokeGradient=i.window:Create('UIGradient',{Rotation=90,Parent=i.topbarItemStroke},{Color={
-'TabStroke',ah.toColorSequence}})i.topbarItemContainer=i.window:Create('Frame',{Size=UDim2.fromOffset(0,34),
-AutomaticSize=Enum.AutomaticSize.X,BackgroundTransparency=1,BorderSizePixel=0,Parent=i.topbarItem})i.window:Create(
+'TabStroke',ah.toColorSequence}})i.topbarItemContainer=i.window:Create('Frame',{Size=UDim2.new(1,0,1,0),AutomaticSize=Enum.AutomaticSize.None,BackgroundTransparency=1,BorderSizePixel=0,Parent=i.topbarItem})i.window:Create(
 'UIPadding',{PaddingLeft=UDim.new(0,13),PaddingRight=UDim.new(0,14),Parent=i.topbarItemContainer})i.topbarItemLayout=i.
 window:Create('UIListLayout',{Padding=UDim.new(0,6),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.
 VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Center,SortOrder=Enum.SortOrder.LayoutOrder,Parent
@@ -1127,8 +1125,7 @@ fromOffset(16,16),BorderSizePixel=0,BackgroundTransparency=1,ImageTransparency=1
 ImageColor3='TabColor'})end if i.name then i.topbarItemTitle=i.window:Create('TextLabel',{Text=ai.t(i.name),Size=UDim2.
 fromOffset(0,16),BorderSizePixel=0,BackgroundTransparency=1,TextSize=16,AutomaticSize=Enum.AutomaticSize.XY,
 TextXAlignment=Enum.TextXAlignment.Left,TextWrapped=true,LayoutOrder=1,TextTransparency=1,Parent=i.topbarItemContainer},
-{TextColor3='TabColor',FontFace='Font'})end end i.tabPage=i.window:Create('ScrollingFrame',{Name=i.name,Size=UDim2.new(1
-,-20,1,0),Position=UDim2.new(0.5,0,0,68),AnchorPoint=Vector2.new(0.5,0.5),BorderSizePixel=0,BackgroundTransparency=1,
+{TextColor3='TabColor',FontFace='Font'})end end i.tabPage=i.window:Create('ScrollingFrame',{Name=i.name,Size=UDim2.new(1,-10,1,0),Position=UDim2.new(0.5,0,0.5,0),AnchorPoint=Vector2.new(0.5,0.5),BorderSizePixel=0,BackgroundTransparency=1,
 AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollingDirection=Enum.
 ScrollingDirection.Y,LayoutOrder=i.customOrder or 0,Parent=i.window.elements})i.tabPageLayout=i.window:Create(
 'UIListLayout',{Padding=UDim.new(0,7),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment
@@ -1415,13 +1412,7 @@ UDim2.fromScale(0.5,1),AnchorPoint=Vector2.new(0.5,1),BackgroundTransparency=1,C
 elementsLayout=y:Create('UIPageLayout',{Padding=UDim.new(0,0),FillDirection=Enum.FillDirection.Horizontal,
 VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Center,SortOrder=Enum.
 SortOrder.LayoutOrder,ScrollWheelInputEnabled=false,GamepadInputEnabled=false,TouchInputEnabled=false,EasingStyle=Enum.
-EasingStyle.Exponential,TweenTime=0.4,Parent=y.elements})y.tabList=y:Create('ScrollingFrame',{Name='Tabs',Active=true,
-Size=UDim2.new(1,0,0,38),Position=UDim2.new(0.5,0,0,65),AnchorPoint=Vector2.new(0.5,0),BackgroundTransparency=1,
-AutomaticCanvasSize=Enum.AutomaticSize.X,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollBarImageTransparency=1
-,ScrollingDirection=Enum.ScrollingDirection.X,Parent=y.main})y.tabListLayout=y:Create('UIListLayout',{Padding=UDim.new(0
-,7),FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum
-.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tabList})y:Create('UIPadding',{PaddingLeft=UDim.
-new(0,22),PaddingRight=UDim.new(0,10),Parent=y.tabList})y.actionContainer=y:Create('Frame',{AnchorPoint=Vector2.new(1,
+EasingStyle.Exponential,TweenTime=0.4,Parent=y.elements})y.tabList=y:Create('ScrollingFrame',{Name='Tabs',Active=true,Size=UDim2.new(0,165,1,-60),Position=UDim2.new(0,15,0,50),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollBarImageTransparency=1,ScrollingDirection=Enum.ScrollingDirection.Y,Parent=y.main})y.tabListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,6),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tabList})y:Create('UIPadding',{PaddingLeft=UDim.new(0,2),PaddingRight=UDim.new(0,6),PaddingTop=UDim.new(0,4),Parent=y.tabList})y.actionContainer=y:Create('Frame',{AnchorPoint=Vector2.new(1,
 0.5),AutomaticSize=Enum.AutomaticSize.X,Size=UDim2.fromOffset(0,24),Position=UDim2.new(1,-20,0.5,0),
 BackgroundTransparency=1,Parent=y.topbar})y.actionsListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,5),
 FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.
