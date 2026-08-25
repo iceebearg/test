@@ -1,4 +1,4 @@
--- Rayfield Gen2 v1.1.1
+-- Rayfield Gen2 v1.1.2
 -- loadstring(game:HttpGet("https://sirius.menu/gen2"))()
 local a local aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,b,c,d,e,f,g,h,i,j={function()local b,c,d=a(1)local e return(function(...)
 local f,g,h,i,j=d(c.utility.variables),d(c.utility.image),d(c.utility.locale),d(c.utility.constants),d(c.types)export
@@ -1407,11 +1407,11 @@ TextXAlignment.Left,TextWrapped=true,TextTransparency=1,Parent=y.titleContainer}
 fromOffset(50,24),AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,LayoutOrder=2,Visible=false,Parent=y.
 topContainer})y.tagContainerLayout=y:Create('UIListLayout',{Padding=UDim.new(0,5),FillDirection=Enum.FillDirection.
 Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tagContainer})y
-.windowShadow=y:CreateGlow(y.main,'ShadowColor',20,1)y.elements=y:Create('Frame',{Name='Elements',Size=UDim2.new(1,-195,1,-60),Position=UDim2.new(0,185,0,50),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,ClipsDescendants=true,Parent=y.main})y.
+.windowShadow=y:CreateGlow(y.main,'ShadowColor',20,1)y.elements=y:Create('Frame',{Name='Elements',Size=UDim2.new(1,-195,1,-72),Position=UDim2.new(0,185,0,60),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,ClipsDescendants=true,Parent=y.main})y.
 elementsLayout=y:Create('UIPageLayout',{Padding=UDim.new(0,0),FillDirection=Enum.FillDirection.Horizontal,
 VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.HorizontalAlignment.Center,SortOrder=Enum.
 SortOrder.LayoutOrder,ScrollWheelInputEnabled=false,GamepadInputEnabled=false,TouchInputEnabled=false,EasingStyle=Enum.
-EasingStyle.Exponential,TweenTime=0.4,Parent=y.elements})y.tabList=y:Create('ScrollingFrame',{Name='Tabs',Active=true,Size=UDim2.new(0,165,1,-60),Position=UDim2.new(0,12,0,50),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollBarImageTransparency=1,ScrollingDirection=Enum.ScrollingDirection.Y,Parent=y.main})y.tabListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,6),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tabList})y:Create('UIPadding',{PaddingLeft=UDim.new(0,2),PaddingRight=UDim.new(0,6),PaddingTop=UDim.new(0,4),Parent=y.tabList})y.actionContainer=y:Create('Frame',{AnchorPoint=Vector2.new(1,
+EasingStyle.Exponential,TweenTime=0.4,Parent=y.elements})y.tabList=y:Create('ScrollingFrame',{Name='Tabs',Active=true,Size=UDim2.new(0,160,1,-74),Position=UDim2.new(0,14,0,62),AnchorPoint=Vector2.new(0,0),BackgroundTransparency=1,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=0,ScrollBarImageTransparency=1,ScrollingDirection=Enum.ScrollingDirection.Y,Parent=y.main})y.tabListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,9),FillDirection=Enum.FillDirection.Vertical,VerticalAlignment=Enum.VerticalAlignment.Top,HorizontalAlignment=Enum.HorizontalAlignment.Left,SortOrder=Enum.SortOrder.LayoutOrder,Parent=y.tabList})y:Create('UIPadding',{PaddingLeft=UDim.new(0,2),PaddingRight=UDim.new(0,6),PaddingTop=UDim.new(0,4),Parent=y.tabList})y.actionContainer=y:Create('Frame',{AnchorPoint=Vector2.new(1,
 0.5),AutomaticSize=Enum.AutomaticSize.X,Size=UDim2.fromOffset(0,24),Position=UDim2.new(1,-20,0.5,0),
 BackgroundTransparency=1,Parent=y.topbar})y.actionsListLayout=y:Create('UIListLayout',{Padding=UDim.new(0,5),
 FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,HorizontalAlignment=Enum.
